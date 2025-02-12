@@ -6,12 +6,12 @@ import com.example.urlshortener.urlShortenerModule.shared.GetLongUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.enums.TimeUnit;
 import com.example.urlshortener.urlShortenerModule.shared.model.LongUrlResponse;
 import com.example.urlshortener.urlShortenerModule.shared.model.ShortenedUrlGenerateResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -37,7 +37,7 @@ public class UrlShortenerUseCaseImpl implements UrlShortenerUseCase {
 
 
     @Override
-    public GenerateShortenUrlDTO.output generateShortenUrl(@NotNull GenerateShortenUrlDTO.input input) {
+    public GenerateShortenUrlDTO.output generateShortenUrl(@NotNull GenerateShortenUrlDTO.input input, HttpServletRequest request) {
         var shortenUrlId = input.getShortenUrlId();
         if (shortenUrlId != null && urlShortenerRepository.existsByShortenedUrlId(shortenUrlId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Short URL already exists");
@@ -51,7 +51,12 @@ public class UrlShortenerUseCaseImpl implements UrlShortenerUseCase {
                 ttl
         );
         urlShortenerRepository.save(urlShortenerEntity);
-        var shortUrl = "http://localhost:9000/" + urlShortenerEntity.getShortenedUrlId();
+
+        String protocol = request.getScheme();
+        String host = request.getServerName();
+        int port = request.getServerPort();
+        var shortUrl = protocol + "://" + host + ":" + port + "/" + urlShortenerEntity.getShortenedUrlId();
+
         log.info("Short url, generated successfully with this data provided {}", urlShortenerEntity);
         return new GenerateShortenUrlDTO.output("Short url generated successfully", new ShortenedUrlGenerateResponse(shortUrl, urlShortenerEntity.getUrl()));
     }

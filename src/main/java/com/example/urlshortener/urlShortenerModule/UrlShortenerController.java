@@ -3,6 +3,7 @@ package com.example.urlshortener.urlShortenerModule;
 import com.example.urlshortener.urlShortenerModule.shared.DeleteShortenUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.GenerateShortenUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.GetLongUrlDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +25,8 @@ public class UrlShortenerController {
     }
 
     @PostMapping("/shortener")
-    public GenerateShortenUrlDTO.output generateShortenUrl(@RequestBody @Valid GenerateShortenUrlDTO.input input) {
-        return urlShortenerUseCase.generateShortenUrl(input);
+    public GenerateShortenUrlDTO.output generateShortenUrl(@RequestBody @Valid GenerateShortenUrlDTO.input input, HttpServletRequest request) {
+        return urlShortenerUseCase.generateShortenUrl(input, request);
     }
 
     @DeleteMapping("{shortenedUrlId}")
