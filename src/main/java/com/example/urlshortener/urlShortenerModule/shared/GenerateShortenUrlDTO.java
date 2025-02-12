@@ -1,5 +1,6 @@
 package com.example.urlshortener.urlShortenerModule.shared;
 
+import com.example.urlshortener.urlShortenerModule.shared.annotation.ValidTtl;
 import com.example.urlshortener.urlShortenerModule.shared.model.ShortenedUrlGenerateResponse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,6 +21,7 @@ public class GenerateShortenUrlDTO {
     public static class input {
         @Size(min = 5) @Size(max = 12) String shortenUrlId;
         @NotNull String url;
+        @ValidTtl
         String ttl;
     }
 
@@ -28,7 +30,8 @@ public class GenerateShortenUrlDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class output {
-        private ShortenedUrlGenerateResponse shortenedUrlResponse;
+        private String message;
+        private ShortenedUrlGenerateResponse response;
     }
 
 }

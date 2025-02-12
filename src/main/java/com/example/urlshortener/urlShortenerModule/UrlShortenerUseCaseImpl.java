@@ -1,5 +1,6 @@
 package com.example.urlshortener.urlShortenerModule;
 
+import com.example.urlshortener.urlShortenerModule.shared.DeleteShortenUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.GenerateShortenUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.GetLongUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.enums.TimeUnit;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -29,7 +31,7 @@ public class UrlShortenerUseCaseImpl implements UrlShortenerUseCase {
     @Override
     public GetLongUrlDTO.output getLongUrl(@NotNull String shortenedUrlId) {
         val shortenedUrl = urlShortenerRepository.findShortenedUrlIdOrThrowException(shortenedUrlId);
-        log.info("Long url for this {} shorten url retrieved successfully", shortenedUrl);
+        log.info("Long url for this {} short url retrieved successfully", shortenedUrl);
         return new GetLongUrlDTO.output(new LongUrlResponse(shortenedUrl.getUrl()));
     }
 
@@ -38,7 +40,7 @@ public class UrlShortenerUseCaseImpl implements UrlShortenerUseCase {
     public GenerateShortenUrlDTO.output generateShortenUrl(@NotNull GenerateShortenUrlDTO.input input) {
         var shortenUrlId = input.getShortenUrlId();
         if (shortenUrlId != null && urlShortenerRepository.existsByShortenedUrlId(shortenUrlId)) {
-            throw new HttpClientErrorException(HttpStatus.CONFLICT, "Shortened URL already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Short URL already exists");
         }
 
         shortenUrlId = shortenUrlId == null ? generateRandomShortenUrl() : shortenUrlId;
@@ -50,22 +52,23 @@ public class UrlShortenerUseCaseImpl implements UrlShortenerUseCase {
         );
         urlShortenerRepository.save(urlShortenerEntity);
         var shortUrl = "http://localhost:9000/" + urlShortenerEntity.getShortenedUrlId();
-        log.info("Shortened url, generated successfully with this data provided {}", urlShortenerEntity);
-        return new GenerateShortenUrlDTO.output(new ShortenedUrlGenerateResponse(shortUrl, urlShortenerEntity.getUrl()));
+        log.info("Short url, generated successfully with this data provided {}", urlShortenerEntity);
+        return new GenerateShortenUrlDTO.output("Short url generated successfully", new ShortenedUrlGenerateResponse(shortUrl, urlShortenerEntity.getUrl()));
     }
 
     @Override
-    public void deleteShortenUrl(@NotNull String shortenedUrlId) {
+    public DeleteShortenUrlDTO.output deleteShortenUrl(@NotNull String shortenedUrlId) {
         val shortenedUrl = urlShortenerRepository.findShortenedUrlIdOrThrowException(shortenedUrlId);
         urlShortenerRepository.deleteById(shortenedUrl.getId());
-        log.info("Deletion of this shortened url is successful {}", shortenedUrl);
+        log.info("Deletion of this short url is successful {}", shortenedUrl);
+        return new DeleteShortenUrlDTO.output("Short url deleted successfully");
     }
 
     @Scheduled(cron = "*/30 * * * * ?")
     private void deleteExpiredShortenedUrls() {
         Instant now = Instant.now();
         urlShortenerRepository.deleteExpiredShortenedUrls(now);
-        log.info("Successfully deleted expired shortened urls");
+        log.info("Successfully deleted expired short urls");
     }
 
     private String generateRandomShortenUrl() {

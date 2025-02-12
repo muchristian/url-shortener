@@ -1,6 +1,7 @@
 package com.example.urlshortener.urlShortenerModule;
 
 
+import com.example.urlshortener.urlShortenerModule.shared.DeleteShortenUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.GenerateShortenUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.GetLongUrlDTO;
 import jakarta.validation.constraints.NotNull;
@@ -10,5 +11,5 @@ public interface UrlShortenerUseCase {
 
     GenerateShortenUrlDTO.output generateShortenUrl(@NotNull GenerateShortenUrlDTO.input input);
 
-    void deleteShortenUrl(@NotNull String shortenedUrlId);
+    DeleteShortenUrlDTO.output deleteShortenUrl(@NotNull String shortenedUrlId);
 }

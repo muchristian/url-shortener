@@ -1,5 +1,6 @@
 package com.example.urlshortener.urlShortenerModule;
 
+import com.example.urlshortener.urlShortenerModule.shared.DeleteShortenUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.GenerateShortenUrlDTO;
 import com.example.urlshortener.urlShortenerModule.shared.GetLongUrlDTO;
 import jakarta.validation.Valid;
@@ -28,7 +29,7 @@ public class UrlShortenerController {
     }
 
     @DeleteMapping("{shortenedUrlId}")
-    public void deleteShortenUrl(@PathVariable("shortenedUrlId") String shortenedUrlId) {
-        urlShortenerUseCase.deleteShortenUrl(shortenedUrlId);
+    public DeleteShortenUrlDTO.output deleteShortenUrl(@PathVariable("shortenedUrlId") String shortenedUrlId) {
+        return urlShortenerUseCase.deleteShortenUrl(shortenedUrlId);
     }
 }

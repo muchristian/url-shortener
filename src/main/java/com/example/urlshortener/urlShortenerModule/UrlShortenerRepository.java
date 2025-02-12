@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -19,7 +20,7 @@ public interface UrlShortenerRepository extends JpaRepository<UrlShortenerEntity
     Optional<UrlShortenerEntity> findByShortenedUrlId(String shortenedUrlId);
     default UrlShortenerEntity findShortenedUrlIdOrThrowException(String shortenedUrlId) {
         Optional<UrlShortenerEntity> ShortenedUrlId = findByShortenedUrlId(shortenedUrlId);
-        return ShortenedUrlId.orElseThrow(() -> new RestClientException("Shortened url not found"));
+        return ShortenedUrlId.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Short url not found"));
     }
 
     boolean existsByShortenedUrlId(String shortenedUrlId);
